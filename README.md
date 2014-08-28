@@ -12,6 +12,8 @@ Things like positional headtracking, photosphere rendering, input detection, aud
 
 Works in Chrome and Firefox. 
 
+![screenie](http://i.imgur.com/Ay6lexZ.jpg)
+
 ## Status
 
 Alpha as fuck, bro!
