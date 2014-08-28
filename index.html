@@ -1,0 +1,537 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Kaikai</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <!-- Sharing -->
+  <meta name="name" content="Kaikai">
+  <meta name="image" content="">
+  <meta name="description" content="Kaikai">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@">
+  <meta name="twitter:title" content="Kaikai">
+  <meta name="twitter:description" content="Kaikai">
+  <meta name="twitter:creator" content="@">
+  <meta name="twitter:image:src" content="">
+  <meta name="twitter:domain" content="">
+
+  <meta itemprop="name" content="Kaikai">
+  <meta itemprop="description" content="">
+  <meta itemprop="image" src="/static/">
+
+  <meta property="og:title" content="Kaikai">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content=""/>
+  <meta property="og:site_name" content="Kaikai">
+  <meta property="og:description" content="Kaikai">
+
+  <link rel="icon" type="image/png" href="/static/images/favicon.png">
+
+  <link href='http://fonts.googleapis.com/css?family=Roboto:100,300,400,700' rel='stylesheet' type='text-/css'>
+  <link rel="icon" type="image/ico" href="images/favicon.ico">
+  <link rel="stylesheet" href="/static/css/main.css">
+
+</head>
+<body>
+<div class="hide">
+  <video id="video" style="display:none" src="/static/"></video>
+  <audio id="audio" style="display:none" src="/static/"></audio>
+</div>
+<div id="view">
+  <div id="demo" class="page">
+    <iframe id="iframe" src="/static/" allowTransparency="true"></iframe>
+  </div>
+  <div id="gallery" class="page">
+    <iframe id="galleryIframe" src="/static/" allowTransparency="true"></iframe>
+  </div>
+  <div id="howto" class="page info-page">
+    <div class="flex-table">
+      <div class="flex-cell">
+        <video id="howto-video" width=300 poster="videos/poster.png" loop="true" autoplay="true">
+           <source src="/static/videos/instruction_v2.webm" type="video/webm"></source>
+           <source src="/static/videos/instruction_v2.mp4" type="video/mp4"></source>
+        </video>
+      </div>
+    </div>
+    <div class="links info-elem">
+      <a href="example.html">See code example</a>
+    </div>
+  </div>
+  <div id="intro" class="page info-page">
+    <div class="flex-table">
+      <div class="flex-cell">
+        <video id="intro-video" width=300 poster="videos/poster.png" loop="true" autoplay="true">
+           <source src="/static/videos/instruction_v1.webm" type="video/webm"></source>
+           <source src="/static/videos/instruction_v1.mp4" type="video/mp4"></source>
+        </video>
+      </div>
+      <div class="help">
+        Having trouble? Make sure your screen is set to auto-rotate.
+      </div>
+    </div>
+  </div>
+
+
+  <div id="landing" class="page info-page">
+    <button class="button" id="button"></button>
+    <h1>Kaikai is loading..</h1>
+    <div id="warning" class="warning"></div>
+    <div class="links">
+    </div>
+  </div>
+
+  <div id="error" class="page info-page">
+    <h1>Kaikai</h1>
+    <div id="unsupported">This experience requires a <span id="unsupported-reason">WebGL</span> enabled mobile browser, such as Google Chrome for Android 4+</div>
+    <div class="links">
+      <a href="https://developers.google.com/Kaikai">What's Kaikai?</a><br />
+      <a href="example.html">See code example</a>
+    </div>
+  </div>
+
+  <div id="desktop" class="page info-page">
+    <h1>Kaikai!</h1>
+    <div id="unsupported">The experience is designed for smartphones with <b>Kaikai</b>. Or, get a preview by selecting an experiment below.</div>
+    <ul id="screenshots">
+      <li>
+        <a alt="Gallery" href="/gallery.html">Storysphere Gallery</a>
+        <p>A photographic storysphere, and a gallery navigator.</p>
+      </li>
+    </ul>
+
+    <div class="links">
+      <a href="https://github.com/Miserlou/Kaikai">Let's have a Kaikai on Github!</a>
+    </div>
+  </div>
+
+  <!-- blank page before routing -->
+  <div id="blank" class="page info-page"></div>
+
+
+</div>
+<div id="shade" class=""></div>
+
+<script src="/static/js/third-party/Modernizr.js"></script>
+<script src="/static/js/third-party/has.js"></script>
+<script src="/static/js/player/no-sleep.js"></script>
+
+<script>
+  var routes = {};
+  function route(path, id, callback) {
+    routes[path] = {id: id, callback: callback};
+  }
+  var view = null;
+  var hide = null;
+  var currentRouteId = null;
+  function router() {
+    view = view || document.getElementById('view');
+    var url = location.hash.slice(1) || '/';
+    var route = routes[url];
+    if (!route) {
+      window.location.hash = '/';
+      return;
+    }
+    console.log('route', route, url);
+    if (currentRouteId === route.id) {
+      return;
+    }
+    currentRouteId = route.id;
+    var el = document.getElementById(route.id);
+    // hide current
+    for (var i = 0; i < view.children.length; i++) {
+      view.children[i].style.display = 'none';
+    }
+    if (shade.className === 'slow up') {
+      shade.className = 'down';
+    }
+    // setTimeout(function() {
+    //   shade.className = 'slow';
+    // }, 100);
+    setTimeout(function() {
+      shade.className = 'slow up';
+    }, 0);
+    // append new
+    el.style.display = 'block';
+    route.callback(el);
+  }
+  window.addEventListener('hashchange', router);
+  window.addEventListener('load', router);
+
+</script>
+<script>
+
+</script>
+<script>
+
+  function pauseGallery() {
+    if (giframe.contentWindow.Kaikai) {
+      giframe.contentWindow.Kaikai.pause();
+    }
+  }
+  function playGallery() {
+    if (giframe.contentWindow.Kaikai) {
+      giframe.contentWindow.Kaikai.play();
+      giframe.contentWindow.Kaikai.controls.align();
+    }
+  }
+
+  route('/desktop', 'desktop', function() {
+  });
+
+  route('/bummer', 'error', function() {
+    iframe.src = '/blank.html';
+    howtoVideo.pause();
+    introVideo.pause();
+    pauseGallery();
+    var missing = missingFeatures() || 'WebGL';
+    unsupportedReason.innerText = missing;
+  });
+
+  route('/', 'landing', function() {
+    iframe.src = '/blank.html';
+    howtoVideo.pause();
+    introVideo.pause();
+    pauseGallery();
+  });
+
+  route('/gallery', 'gallery', function() {
+    iframe.src = '/blank.html';
+
+    if (giframe.src.indexOf('/gallery.html') < 0) {
+      giframe.src = '/gallery.html';
+    } else {
+      // this should be handled in /gallery.html
+      if (giframe.contentWindow.shade) {
+        giframe.contentWindow.shade.style.backgroundColor = '';
+      }
+      // if already loaded propagate the orientationchange
+      onIframeLoad(giframe);
+    }
+    // giframe.src = '/gallery.html';
+
+    playGallery();
+    introVideo.pause();
+    howtoVideo.pause();
+  });
+
+  route('/intro', 'intro', function() {
+    pauseGallery();
+    howtoVideo.pause();
+    // introVideo.style.display = 'none';
+    // introVideo.pause();
+    introVideo.play();
+    setTimeout(function() {
+      if (window.location.hash !== '#/intro') {
+        // return if no longer on the intro page
+        return;
+      }
+      switch (getOrientation()) {
+        case 90:
+        case -90:
+          window.location.hash = '/gallery';
+          break;
+      }
+    }, 7000);
+  });
+
+  route('/info', 'howto', function() {
+    iframe.src = '/blank.html';
+    howtoVideo.play();
+    introVideo.pause();
+    pauseGallery();
+  });
+
+  ['reel', 'rollercoaster', 'shinysound',
+   'collector', 'bears', 'reef', 'music'].forEach(function(name) {
+
+    route('/' + name, 'demo', function() {
+      pauseGallery();
+      howtoVideo.pause();
+      introVideo.pause();
+      var src;
+      switch (name) {
+        case 'music':
+          src = 'http://vr.georgeandjonathan.com';
+          break;
+        case 'bears':
+        case 'reef':
+          src = '/sphericalvideo.html?video=' + name;
+          break;
+        default:
+          src = '/' + name + '.html';
+      }
+      iframe.src = src;
+    });
+
+  });
+
+
+  var button = document.getElementById('button');
+  var error = document.getElementById('error');
+  var flipback = document.getElementById('flipback');
+  var giframe = document.getElementById('galleryIframe');
+  var howto = document.getElementById('howto');
+  var howtoVideo = document.getElementById('howto-video');
+  var introVideo = document.getElementById('intro-video');
+  var flipback = document.getElementById('flipback');
+  var video = document.getElementById('video');
+  var iframe = document.getElementById('iframe');
+  var shade = document.getElementById('shade');
+  var unsupported = document.getElementById('unsupported');
+  var unsupportedReason = document.getElementById('unsupported-reason');
+  var video = document.getElementById('video');
+  var view = document.getElementById('view');
+
+  var noSleep = new NoSleep();
+
+  // window.location.hash = '/';
+
+  howtoVideo.style.display = 'none';
+  howtoVideo.load();
+  howtoVideo.addEventListener('playing', function() {
+    howtoVideo.style.display = '';
+  }, false);
+  introVideo.style.display = 'none';
+  introVideo.load();
+  introVideo.addEventListener('playing', function() {
+    setTimeout(function() {
+      introVideo.style.display = '';
+    }, 2000);
+  }, false);
+
+  function vertical() {
+    window.orientation = 0;
+    onScreenOrientationChangeEvent();
+  }
+
+  function horizontal() {
+    window.orientation = 90;
+    onScreenOrientationChangeEvent();
+  }
+
+  var audioContext;
+
+  function initAudioContext() {
+    try {
+      // Fix up for prefixing
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioContext = new AudioContext();
+
+      // play empty sound to enable audio on iOS
+      var buffer = audioContext.createBuffer(1, 1, 22050);
+      var source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(0);
+    } catch (e) {
+      console.warn('Web Audio API is not supported in this browser');
+    }
+  }
+
+  function fullscreen(target) {
+    if (target.requestFullscreen) target.requestFullscreen();
+    else if (target.msRequestFullscreen) target.msRequestFullscreen();
+    else if (target.mozRequestFullScreen) target.mozRequestFullScreen();
+    else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+  }
+
+  // go back to home when you exit fullscreen
+  var isFullscreen = false;
+  ['webkitfullscreenchange', 'fullscreeenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(function(name) {
+    document.addEventListener(name, function(evt) {
+      isFullscreen = !isFullscreen;
+      if (!isFullscreen) {
+        window.location.hash = '/';
+      }
+    }, false);
+  });
+
+  button.addEventListener('click', function(evt) {
+    if (has.mobile) {
+      fullscreen(document.body);
+    }
+    howtoVideo.play();
+    introVideo.play();
+    initAudioContext();
+    video.play();
+    noSleep.enable();
+    if (giframe.src.indexOf('/gallery.html') < 0) {
+      giframe.src = '/gallery.html';
+    }
+    window.location.hash = '/intro';
+  }, false);
+
+  var polyfillOrientation = function(target) {
+      switch (getOrientation()) {
+        case 90:
+          target.screen.orientation = 'landscape-primary';
+          break;
+        case -90:
+          target.screen.orientation = 'landscape-secondary';
+          break;
+        case 180:
+          target.screen.orientation = 'portrait-secondary';
+          break;
+        case 0:
+          target.screen.orientation = 'portrait-primary';
+          break;
+      }
+  };
+
+  var openDemo = function(demo) {
+    window.location.hash = '/' + demo.slug;
+  };
+
+  // hijack and inject orientation controls
+  var onIframeLoad = function(iframe) {
+    try {
+      // try to inject the orientation polyfill for broken iframes
+      polyfillOrientation(iframe.contentWindow);
+    } catch (e) {
+      console.log(e);
+      iframe.contentWindow.postMessage(JSON.stringify({
+        type: 'orientationchange',
+        data: {orientation: getOrientation()}
+      }), '*');
+    }
+  };
+
+  giframe.addEventListener('load', function(evt) {
+    onIframeLoad(giframe);
+  }, false);
+
+  iframe.addEventListener('load', function(evt) {
+    onIframeLoad(iframe);
+  }, false);
+
+  var getOrientation = function() {
+    switch (window.screen.orientation || window.screen.mozOrientation) {
+      case 'landscape-primary':
+        return 90;
+      case 'landscape-secondary':
+        return -90;
+      case 'portrait-secondary':
+        return 180;
+      case 'portrait-primary':
+        return 0;
+    }
+    // if (!window.orientation && window.innerWidth > window.innerHeight)
+    //   return 90;
+    return window.orientation || 0;
+  };
+
+
+
+  var onScreenOrientationChangeEvent = function(evt) {
+    if (window.location.hash === '#/') {
+      return;
+    }
+    switch (getOrientation()) {
+      case -90:
+      case 90: // horizontal
+        console.log('horizontal');
+        if (window.location.hash !== '/gallery') {
+          navigator.vibrate(50);
+          window.location.hash = '/gallery';
+        }
+        break;
+      default: // vertical
+        console.log('vertical');
+        if (window.location.hash !== '/info') {
+          navigator.vibrate(50);
+          window.location.hash = '/info';
+        }
+    }
+  };
+
+  var mql = window.matchMedia('(orientation: portrait)');
+
+  function bindEvents() {
+    mql.addListener(onScreenOrientationChangeEvent);
+    window.addEventListener('orientationchange', onScreenOrientationChangeEvent, false);
+  }
+
+  function unbindEvents() {
+    mql.removeEventListener(onScreenOrientationChangeEvent);
+    window.removeEventListener('orientationchange', onScreenOrientationChangeEvent, false);
+  }
+
+
+  function disableAll() {
+    rafCheck.running = false;
+    console.log('stop');
+    noSleep.disable();
+    video.pause();
+    video.src = '';
+    unbindEvents();
+    iframe.src = '/blank.html';
+    window.location.hash = '/';
+  }
+
+  function enableAll() {
+    playGallery();
+    rafCheck.running = true;
+    noSleep.enable();
+    bindEvents();
+  }
+
+  function rafCheck() {
+    if (rafCheck.count % rafCheck.rate === 0) {
+      clearTimeout(rafCheck.check);
+      rafCheck.check = setTimeout(disableAll, 9000);
+      rafCheck.count = 0;
+    }
+    rafCheck.count += 1;
+    if (!rafCheck.running) {
+      console.log('run');
+      enableAll();
+      if (window.location.hash !== '#/') {
+        window.location.hash = '/';
+      }
+    }
+    window.requestAnimationFrame(rafCheck);
+  }
+  rafCheck.rate = 29;
+  rafCheck.count = 0;
+
+  // check for errors and route on load
+  if (!has.mobile && has.webgl) {
+    window.location.hash = '/desktop';
+  } else if (missingFeatures()) {
+    window.location.hash = '/bummer';
+  } else {
+    window.requestAnimationFrame(rafCheck);
+  }
+
+
+  function missingFeatures() {
+    if (!has.webgl) return 'WebGL';
+    if (!Modernizr.webaudio) return 'Web Audio API';
+    if (!Modernizr.canvas) return 'Canvas';
+    if (!Modernizr.devicemotion ||
+        !Modernizr.deviceorientation) return 'gyroscope';
+    // if (!Modernizr.fullscreen) return 'Full Screen API';
+    if (!Modernizr.history ||
+        !Modernizr.localstorage ||
+        !Modernizr.postmessage) return 'HTML5';
+    if (!Modernizr.touch) return 'touch';
+    return '';
+  }
+
+  // Extra warning for mobile firefox
+  var warning = document.getElementById('warning');
+  if (has.mobile && has.Firefox) {
+    warning.innerHTML = 'This experience doesn’t support your browser (yet).';
+    button.innerHTML = 'Try anyway';
+  } else {
+    warning.style.display = 'none';
+  }
+
+</script>
+</body>
+</html>
+

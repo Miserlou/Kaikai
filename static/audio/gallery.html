@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Chrome Experiments for Cardboard</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+
+    <!-- Sharing -->
+    <meta name="name" content="Cardboard">
+    <meta name="image" content="http://vr.chromeexperiments.com/images/vr.jpg">
+    <meta name="description" content="A virtual reality Chrome Experiment for Cardboard.">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ChromeExp">
+    <meta name="twitter:title" content="Cardboard">
+    <meta name="twitter:description" content="A virtual reality Chrome Experiment for Cardboard.">
+    <meta name="twitter:creator" content="@ChromeExp">
+    <meta name="twitter:image:src" content="http://vr.chromeexperiments.com/images/vr.jpg">
+    <meta name="twitter:domain" content="ChromeExperiments.com">
+
+    <meta itemprop="name" content="Cardboard">
+    <meta itemprop="description" content="A virtual reality Chrome Experiment for Cardboard.">
+    <meta itemprop="image" src="http://vr.chromeexperiments.com/images/vr.jpg">
+
+    <meta property="og:title" content="Cardboard">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="http://vr.chromeexperiments.com/images/vr.jpg"/>
+    <meta property="og:site_name" content="Cardboard">
+    <meta property="og:description" content="A virtual reality Chrome Experiment for Cardboard.">
+
+
+  <link href='//fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<style>
+    body {
+      margin: 0px;
+      background-color: #000;
+      overflow: hidden;
+		}
+    #shade, #scene {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #shade {
+      background-color: rgba(0,0,0,0);
+      -moz-transition: all 1s ease-in-out;
+      -webkit-transition: all 1s ease-in-out;
+      -o-transition: all 1s ease-in-out;
+      transition: all 1s ease-in-out;
+      pointer-events: none;
+    }
+	</style>
+</head>
+<body>
+
+<div id="scene"></div>
+<div id="shade"></div>
+
+<script> window.history.replaceState({},"","/"); </script>
+
+<script src="js/third-party/threejs/three.min.js"></script>
+<script src="js/third-party/threejs/StereoEffect.js"></script>
+<script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
+<script src="js/third-party/threejs/OrbitControls.js"></script>
+
+<script src="js/third-party/has.js"></script>
+
+<script src="js/DetectScreenSize.js"></script>
+<script src="js/Cardboard.js"></script>
+
+<script src="js/gallery/audio.js"></script>
+
+<script>
+var DEMOS = [
+  {
+    'slug': 'reef',
+    'href': '/sphericalvideo.html?video=reef',
+    'preview': '/images/preview/reef.jpg'
+  },
+  {
+    'slug': 'reel',
+    'href': '/reel.html',
+    'preview': '/images/preview/reel.jpg'
+  },
+  {
+    'slug': 'shinysound',
+    'href': '/shinysound.html',
+    'preview': '/images/preview/shinysound.jpg'
+  },
+  {
+    'slug': 'collector',
+    'href': '/collector.html',
+    'preview': '/images/preview/collector.jpg'
+  },
+	{
+		'slug': 'music',
+		'href': 'http://vr.georgeandjonathan.com',
+		'preview': '/images/preview/gandj.png'
+	},
+  {
+    'slug': 'bears',
+    'href': '/sphericalvideo.html?video=bears',
+    'preview': '/images/preview/bears.jpg'
+  },
+  {
+    'slug': 'rollercoaster',
+    'href': '/rollercoaster.html',
+    'preview': '/images/preview/rollercoaster.jpg'
+  }
+];
+</script>
+
+<script>
+var SCALE = 3;
+
+(function() {
+
+var root = this;
+
+
+function Cursor() {
+  var geometry = new THREE.RingGeometry(
+    0.85 * Cursor.SIZE * SCALE, 1 * Cursor.SIZE * SCALE, 32
+  );
+  var material = new THREE.MeshBasicMaterial(
+    {color: 0xffffff, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }
+  );
+  THREE.Mesh.call(this, geometry, material);
+}
+
+Cursor.SIZE = 0.1 * SCALE;
+Cursor.prototype = Object.create(THREE.Mesh.prototype);
+Cursor.prototype.constructor = Cursor;
+
+function Demo(info) {
+  THREE.Object3D.call(this);
+
+  this.slug = info.slug;
+  this.href = info.href;
+
+  var geometry = new THREE.PlaneGeometry(this.width, this.height);
+  var texture = THREE.ImageUtils.loadTexture(info.preview);
+  var material = new THREE.MeshBasicMaterial({map: texture});
+  var plane = new THREE.Mesh(geometry, material);
+  this.add(plane);
+}
+
+Demo.prototype = Object.create(THREE.Object3D.prototype);
+Demo.prototype.constructor = Demo;
+Demo.prototype.width = 1 * SCALE;
+Demo.prototype.height = 1 * SCALE;
+
+// highlight shows it for selection
+Demo.prototype.highlight = function() {
+  console.log('highlight');
+  this.object.material.color.setHex(0xff0000);
+};
+
+// begin private gallery setup functions
+function lookToClick() {
+  // create the raycaster
+  this.projector = new THREE.Projector();
+  this.raycaster = new THREE.Raycaster();
+}
+
+var RADIUS = 4 * SCALE;
+
+function addDemos(demos) {
+  this.intersectables = [];
+  var hl = demos.length / 3.0;
+  for (var i = 0; i < demos.length; i++) {
+    var demo = new Demo(demos[i]);
+    window.demo = demo;
+    var theta = (i + hl) * 0.3;
+    demo.position.x = RADIUS * Math.cos(theta);
+    demo.position.z = RADIUS * Math.sin(theta);
+    demo.lookAt(cardboard.camera.position);
+    this.add(demo);
+    this.intersectables.push(demo.children[0]);
+  }
+}
+
+function setupSkybox() {
+  var skyBoxTexture = THREE.ImageUtils.loadTextureCube([
+    '/textures/skybox_stars/512/s_px.jpg',
+    '/textures/skybox_stars/512/s_nx.jpg',
+    '/textures/skybox_stars/512/s_py.jpg',
+    '/textures/skybox_stars/512/s_ny.jpg',
+    '/textures/skybox_stars/512/s_pz.jpg',
+    '/textures/skybox_stars/512/s_nz.jpg'
+  ]);
+
+  var skyBoxShader = THREE.ShaderLib.cube;
+  skyBoxShader.uniforms.tCube.value = skyBoxTexture;
+
+  var skyBoxMaterial = new THREE.ShaderMaterial({
+          fragmentShader: skyBoxShader.fragmentShader,
+          vertexShader: skyBoxShader.vertexShader,
+          uniforms: skyBoxShader.uniforms,
+          deptTest: false,
+          depthWrite: false,
+          side: THREE.BackSide
+  });
+
+  var skyBox = new THREE.Mesh(
+          new THREE.BoxGeometry(500, 500, 500),
+          skyBoxMaterial
+  );
+
+  this.add(skyBox);
+}
+// end private gallery setup functions
+
+function Gallery(demos) {
+  THREE.Object3D.call(this);
+
+  lookToClick.bind(this)();
+  addDemos.bind(this)(demos);
+
+  // skybox
+  setupSkybox.bind(this)();
+
+  this.openSound = this.selectSound = function() {};
+  LoadAudio('/audio/open.mp3', function(sound) {
+    this.openSound = sound;
+  }.bind(this));
+
+}
+
+Gallery.prototype = Object.create(THREE.Object3D.prototype);
+Gallery.prototype.constructor = Gallery;
+
+var TTL = 100;
+Gallery.prototype.findIntersections = function() {
+  var gaze = new THREE.Vector3(0, 0, 1);
+  window.gaze = gaze;
+
+  this.projector.unprojectVector(gaze, cardboard.camera);
+
+  this.raycaster.set(
+    cardboard.camera.position,
+    gaze.sub(cardboard.camera.position).normalize()
+  );
+
+  var intersects = this.raycaster.intersectObjects(this.intersectables);
+
+  // reset
+  this.intersectables.forEach(function(i) {
+    i.scale.set(1, 1, 1);
+    i.position.z = 0;
+  });
+  cursor.scale.set(1, 1, 1);
+
+  // if found
+  if (intersects.length > 0) {
+    var found = intersects[0];
+    // highlight
+    found.object.scale.set(1.2, 1.2, 1.2);
+    found.object.position.z = 0.1;
+    if (!this.selected) {
+      this.selectSound();
+      window.navigator.vibrate(30);
+      this.selected = { id: found.object.uuid, ttl: TTL, obj: found.object };
+    } else {
+      if (this.selected.id == found.object.uuid) {
+        // decrement
+        this.selected.ttl -= 1;
+        var p = (this.selected.ttl / TTL);
+        cursor.scale.set(p, p, p);
+        if (this.selected.ttl <= 0) {
+          p = p * 100;
+          cursor.scale.set(p, p, p);
+          this.open(this.selected.obj.parent);
+          // cursor.scale.set(0,0,0);
+        }
+      } else {
+        this.selectSound();
+        window.navigator.vibrate(30);
+        this.selected = { id: found.object.uuid, ttl: TTL, obj: found.object };
+      }
+    }
+  } else {
+    this.selected = null;
+  }
+};
+
+var shade = document.getElementById('shade');
+root.shade = shade;
+
+Gallery.prototype.open = function(demo) {
+  if (this.open.opening) {
+    return;
+  }
+  this.openSound();
+  window.navigator.vibrate(100);
+  shade.style.backgroundColor = 'rgba(0,0,0,1)';
+  this.open.opening = true;
+  setTimeout(function() {
+    window.top.openDemo({slug: demo.slug, href: demo.href});
+    this.open.opening = false;
+    this.selected = null;
+    shade.style.backgroundColor = '';
+  }.bind(this), 1000);
+  console.log('open demo', demo.href);
+  // window.location.href = demo.href;
+};
+
+root.openDemo = function(demo) {
+  window.location.href = demo.href;
+};
+
+Gallery.prototype.update = function() {
+  this.findIntersections();
+};
+
+// export
+root.Gallery = Gallery;
+root.Demo = Demo;
+root.Cursor = Cursor;
+
+})();
+
+</script>
+
+<script>
+
+// add no sleep
+
+// add full screen
+
+// initialize the screen
+
+
+var cardboard, gallery, cursor;
+
+function setup() {
+
+  cardboard = new Cardboard();
+
+  gallery = new Gallery(DEMOS);
+  cardboard.scene.add(gallery);
+
+  cursor = new Cursor();
+  cardboard.camera.add(cursor);
+  cursor.position.z = -3 * SCALE;
+  cursor.lookAt(cardboard.camera.position);
+
+  cardboard.effect.separation = 0.6;
+
+  if (!has.mobile) {
+    setTimeout(function() {
+      cardboard.orbitControls.target.set(0,0.3,1);
+    },0);
+  }
+
+  cardboard.update = function() {
+    Cardboard.prototype.update.call(this);
+    gallery.update();
+  };
+
+  document.getElementById('scene').appendChild(cardboard.renderer.domElement);
+
+}
+
+
+setup();
+
+</script>
+<script>  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-51967321-1', 'chromeexperiments.com');  ga('send', 'pageview');
+</script>
+
+</body>
+</html>
