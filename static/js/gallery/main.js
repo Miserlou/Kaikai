@@ -1,4 +1,4 @@
-/*global THREE kaikai LoadAudio cursor*/
+/*global THREE kaikai LoadAudio cursor util*/
 var SCALE = 3;
 
 (function() {
@@ -99,10 +99,16 @@ var SCALE = 3;
     }
 
     function setupPhotosphere() {
+        var image_url = util.getParameterByName('image_url');
+        if (image_url) {
+            image_url = '/proxy?url=' + encodeURIComponent(image_url) + '&resize=1';
+        } else {
+            image_url = '/static/photospheres/redwoods_with_code.jpg';
+        }
         var sphere = new THREE.Mesh(
             new THREE.SphereGeometry(100, 20, 20),
             new THREE.MeshBasicMaterial({
-                map: THREE.ImageUtils.loadTexture('/static/photospheres/redwoods_with_code.jpg')
+                map: THREE.ImageUtils.loadTexture(image_url)
             })
         );
         sphere.scale.x = -1;
@@ -125,9 +131,11 @@ var SCALE = 3;
             this.openSound = sound;
         }.bind(this));
 
-        LoadAudio('/static/audio/champions.mp3', function(sound) {
-            sound();
-        });
+        if (util.getParameterByName('music')) {
+            LoadAudio('/static/audio/champions.mp3', function(sound) {
+                sound();
+            });
+        }
 
     }
 

@@ -1,22 +1,45 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, Response, request
+from PIL import Image
+from StringIO import StringIO
+import math
+import requests
 import sys
 import os
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route("/blank")
+@app.route('/blank')
 def blank():
     return render_template('blank.html')
 
-@app.route("/gallery")
+@app.route('/gallery')
 def gallery():
     return render_template('gallery.html')
 
-if __name__ == "__main__":
+@app.route('/proxy')
+def proxy():
+    url = request.args.get('url')
+    resize = request.args.get('resize')
+    req = requests.get(url)
+    content = req.content
+    if resize:
+        image = Image.open(StringIO(req.content))
+        width, height = image.size
+        next_power_of_two = math.floor(math.log(width, 2))
+        new_width = 2 ** next_power_of_two
+        ratio = 1.0 * new_width / width
+        new_height = height * ratio
+        image = image.resize((int(new_width), int(new_height)))
+        imagefile = StringIO()
+        image.save(imagefile, format='JPEG')
+        content = imagefile.getvalue()
+    return Response(content, content_type=req.headers['content-type'])
+
+if __name__ == '__main__':
     debug = False
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         debug = True
