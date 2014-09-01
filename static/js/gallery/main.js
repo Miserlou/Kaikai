@@ -70,12 +70,12 @@ var SCALE = 3;
 
     function setupSkybox() {
         var skyBoxTexture = THREE.ImageUtils.loadTextureCube([
-            './static/textures/stars/s_px.jpg',
-            './static/textures/stars/s_nx.jpg',
-            './static/textures/stars/s_py.jpg',
-            './static/textures/stars/s_ny.jpg',
-            './static/textures/stars/s_pz.jpg',
-            './static/textures/stars/s_nz.jpg'
+            '/static/textures/stars/s_px.jpg',
+            '/static/textures/stars/s_nx.jpg',
+            '/static/textures/stars/s_py.jpg',
+            '/static/textures/stars/s_ny.jpg',
+            '/static/textures/stars/s_pz.jpg',
+            '/static/textures/stars/s_nz.jpg'
         ]);
 
         var skyBoxShader = THREE.ShaderLib.cube;
@@ -102,7 +102,7 @@ var SCALE = 3;
         var sphere = new THREE.Mesh(
             new THREE.SphereGeometry(100, 20, 20),
             new THREE.MeshBasicMaterial({
-                map: THREE.ImageUtils.loadTexture('./static/photospheres/redwoods_with_code.jpg')
+                map: THREE.ImageUtils.loadTexture('/static/photospheres/redwoods_with_code.jpg')
             })
         );
         sphere.scale.x = -1;
@@ -121,11 +121,11 @@ var SCALE = 3;
         setupPhotosphere.bind(this)();
 
         this.openSound = this.selectSound = function() {};
-        LoadAudio('./static/audio/open.mp3', function(sound) {
+        LoadAudio('/static/audio/open.mp3', function(sound) {
             this.openSound = sound;
         }.bind(this));
 
-        LoadAudio('./static/audio/champions.mp3', function(sound) {
+        LoadAudio('/static/audio/champions.mp3', function(sound) {
             sound();
         });
 

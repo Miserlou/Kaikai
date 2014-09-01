@@ -98,7 +98,7 @@
     <div id="unsupported">The experience is designed for smartphones with <b>Kaikai</b>. Or, get a preview by selecting an experiment below.</div>
     <ul id="screenshots">
       <li>
-        <a alt="Gallery" href="/gallery.html">Storysphere Gallery</a>
+        <a alt="Gallery" href="/gallery">Storysphere Gallery</a>
         <p>A photographic storysphere, and a gallery navigator.</p>
       </li>
     </ul>
@@ -183,7 +183,7 @@
   });
 
   route('/bummer', 'error', function() {
-    iframe.src = '/blank.html';
+    iframe.src = '/blank';
     howtoVideo.pause();
     introVideo.pause();
     pauseGallery();
@@ -192,26 +192,26 @@
   });
 
   route('/', 'landing', function() {
-    iframe.src = '/blank.html';
+    iframe.src = '/blank';
     howtoVideo.pause();
     introVideo.pause();
     pauseGallery();
   });
 
   route('/gallery', 'gallery', function() {
-    iframe.src = '/blank.html';
+    iframe.src = '/blank';
 
-    if (giframe.src.indexOf('/gallery.html') < 0) {
-      giframe.src = '/gallery.html';
+    if (giframe.src.indexOf('/gallery') < 0) {
+      giframe.src = '/gallery';
     } else {
-      // this should be handled in /gallery.html
+      // this should be handled in /gallery
       if (giframe.contentWindow.shade) {
         giframe.contentWindow.shade.style.backgroundColor = '';
       }
       // if already loaded propagate the orientationchange
       onIframeLoad(giframe);
     }
-    // giframe.src = '/gallery.html';
+    // giframe.src = '/gallery';
 
     playGallery();
     introVideo.pause();
@@ -239,7 +239,7 @@
   });
 
   route('/info', 'howto', function() {
-    iframe.src = '/blank.html';
+    iframe.src = '/blank';
     howtoVideo.play();
     introVideo.pause();
     pauseGallery();
@@ -359,8 +359,8 @@
     initAudioContext();
     video.play();
     noSleep.enable();
-    if (giframe.src.indexOf('/gallery.html') < 0) {
-      giframe.src = '/gallery.html';
+    if (giframe.src.indexOf('/gallery') < 0) {
+      giframe.src = '/gallery';
     }
     window.location.hash = '/intro';
   }, false);
@@ -468,7 +468,7 @@
     video.pause();
     video.src = '';
     unbindEvents();
-    iframe.src = '/blank.html';
+    iframe.src = '/blank';
     window.location.hash = '/';
   }
 
@@ -534,4 +534,3 @@
 </script>
 </body>
 </html>
-
