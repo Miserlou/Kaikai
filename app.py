@@ -23,6 +23,10 @@ def gallery():
 @app.route('/proxy')
 def proxy():
     url = request.args.get('url')
+    # dropbox URLs have ?dl=0 which brings you to a landing page
+    # flip that to ?dl=1 to download the image itself
+    if url.find('dropbox.com') != -1:
+        url = url.replace('dl=0', 'dl=1')
     resize = request.args.get('resize')
     req = requests.get(url)
     content = req.content
