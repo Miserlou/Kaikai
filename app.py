@@ -20,6 +20,10 @@ def blank():
 def gallery():
     return render_template('gallery.html')
 
+@app.route('/sphere')
+def sphere():
+    return render_template('sphere.html')
+
 @app.route('/proxy')
 def proxy():
     url = request.args.get('url')
