@@ -1,4 +1,4 @@
-![replaceme](http://i.imgur.com/kQhnJE0.png)
+![logo](http://i.imgur.com/iTv4hud.png)
 
 # Kaikai
 
