@@ -38,6 +38,8 @@ def proxy():
         image = Image.open(StringIO(req.content))
         width, height = image.size
         next_power_of_two = math.floor(math.log(width, 2))
+        if next_power_of_two > 12:
+            next_power_of_two = 12
         new_width = 2 ** next_power_of_two
         ratio = 1.0 * new_width / width
         new_height = height * ratio
