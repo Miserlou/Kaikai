@@ -61,4 +61,5 @@ if __name__ == '__main__':
                 filename = os.path.join(dirname, filename)
                 if os.path.isfile(filename):
                     extra_files.append(filename)
-    app.run(host='0.0.0.0', debug=debug, port=9090, extra_files=extra_files)
+    threaded = not debug
+    app.run(host='0.0.0.0', debug=debug, port=9090, extra_files=extra_files, threaded=threaded)
